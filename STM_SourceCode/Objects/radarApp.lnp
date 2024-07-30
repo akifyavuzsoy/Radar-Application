@@ -3,6 +3,7 @@
 ".\objects\controller.o"
 ".\objects\hcsr04.o"
 ".\objects\servo.o"
+".\objects\uart.o"
 ".\objects\stm32f4xx_hal.o"
 ".\objects\stm32f4xx_hal_cortex.o"
 ".\objects\stm32f4xx_hal_dma.o"

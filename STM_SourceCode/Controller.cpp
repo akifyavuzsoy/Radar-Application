@@ -1,6 +1,8 @@
 #include "Controller.h"
 #include <string.h>
 
+extern UART_HandleTypeDef huart2;
+
 void Init_System_Controller(SysController* controller)
 {
 	controller->HCSR04_Distance = 0;
@@ -20,6 +22,7 @@ void Init_System_Controller(SysController* controller)
 	// Clear UART buffers
 	memset(controller->UART_RX_BUF, 0, BufSize);
 	memset(controller->UART_TX_BUF, 0, BufSize);
+	
 }
 
 // TODO: void yerine uint8_tt kullanarak hata aldiginda -1 döndürecek try-catch kullanilacak...
@@ -43,7 +46,7 @@ void Servo_IncreasePosition(SysController* controller,Servo* servo, uint8_t incr
 }
 
 // 
-void Assign_UartTxBuf(SysController* controller)
+void Assign_UartTxBuf(SysController* controller, Uart* uart)
 {
 	memset(controller->UART_TX_BUF, 0, sizeof(controller->UART_TX_BUF));
 	
@@ -65,106 +68,64 @@ void Assign_UartTxBuf(SysController* controller)
 	controller->UART_TX_BUF[124] = 0xFB;
 	controller->UART_TX_BUF[125] = 0xFA;
 	
-	GetCRC(controller->UART_TX_BUF, 128);
+	uart->GetCRC(controller->UART_TX_BUF, 128);
 	
 }
 
-// TODO: Send To UART_TX_BUF array via Uart....
-
-
-
-char CRC_check(char message[],unsigned int message_length)
+void HAL_MspInit(void)
 {
-		volatile unsigned int crc[2];
-		volatile unsigned int CRCFull = 0xFFFF;
-		volatile unsigned int CRCHigh = 0xFF, CRCLow = 0xFF;
-		volatile unsigned int CRCLSB;
-		volatile unsigned int i=0;
-		volatile unsigned int j=0;
-		char CRC_OK=0;
-    //Function expects a modbus message of any length as well as a 2 byte CRC array in which to 
-    //return the CRC values:
-    for (i = 0; i < message_length-2; i++)
-    {
-        CRCFull = (unsigned int)(CRCFull ^ message[i]);
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
+  __HAL_RCC_PWR_CLK_ENABLE();
 
-        for (j = 0; j < 8; j++)
-        {
-            CRCLSB =  (unsigned int)( CRCFull & 0x0001);
-            CRCFull = (unsigned int)((CRCFull >> 1) & 0x7FFF);
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
 
-            if (CRCLSB == 1)
-                CRCFull = (unsigned int)(CRCFull ^ 0xA001);
-        }
-    }
-    crc[1] = CRCHigh = (unsigned int)((CRCFull >> 8) & 0xFF);
-    crc[0] = CRCLow  = (unsigned int)( CRCFull & 0xFF);
-    if((crc[0] == message[message_length-2]) && (crc[1] == message[message_length-1]))
-    CRC_OK = 1;
-    else
-    CRC_OK = 0;
-    return CRC_OK;		
 }
 
-
-void GetCRC(char message[],unsigned int message_length)
+void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 {
-    volatile unsigned int crc[2];
-		volatile unsigned int CRCFull = 0xFFFF;
-		volatile unsigned int CRCHigh = 0xFF, CRCLow = 0xFF;
-		volatile unsigned int CRCLSB;
-		volatile unsigned int i=0;
-		volatile unsigned int j=0;
-		volatile char CRC_OK=0;
-    //Function expects a modbus message of any length as well as a 2 byte CRC array in which to 
-    //return the CRC values:
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(huart->Instance==USART2)
+  {
+    /* Peripheral clock enable */
+    __HAL_RCC_USART2_CLK_ENABLE();
 
-    for (i = 0; i < message_length-2; i++)
-    {
-        CRCFull = (unsigned int)(CRCFull ^ message[i]);
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**USART2 GPIO Configuration
+    PA2     ------> USART2_TX
+    PA3     ------> USART2_RX
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-        for (j = 0; j < 8; j++)
-        {
-            CRCLSB = (unsigned int)(CRCFull & 0x0001);
-            CRCFull = (unsigned int)((CRCFull >> 1) & 0x7FFF);
+  }
 
-            if (CRCLSB == 1)
-                CRCFull = (unsigned int)(CRCFull ^ 0xA001);
-        }
-    }
-    crc[1] = CRCHigh = (unsigned int)((CRCFull >> 8) & 0xFF);
-    crc[0] = CRCLow  = (unsigned int)( CRCFull & 0xFF);
-    message[message_length-2] = crc[0];
-    message[message_length-1] = crc[1];
 }
 
-void GetCRC(unsigned char message[],unsigned int message_length)
+void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 {
-    volatile unsigned int crc[2];
-		volatile unsigned int CRCFull = 0xFFFF;
-		volatile unsigned int CRCHigh = 0xFF, CRCLow = 0xFF;
-		volatile unsigned int CRCLSB;
-		volatile unsigned int i=0;
-		volatile unsigned int j=0;
-		volatile char CRC_OK=0;
-    //Function expects a modbus message of any length as well as a 2 byte CRC array in which to 
-    //return the CRC values:
+  if(huart->Instance==USART2)
+  {
+    /* Peripheral clock disable */
+    __HAL_RCC_USART2_CLK_DISABLE();
 
-    for (i = 0; i < message_length-2; i++)
-    {
-        CRCFull = (unsigned int)(CRCFull ^ message[i]);
+    /**USART2 GPIO Configuration
+    PA2     ------> USART2_TX
+    PA3     ------> USART2_RX
+    */
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2|GPIO_PIN_3);
+  }
 
-        for (j = 0; j < 8; j++)
-        {
-            CRCLSB = (unsigned int)(CRCFull & 0x0001);
-            CRCFull = (unsigned int)((CRCFull >> 1) & 0x7FFF);
+}
 
-            if (CRCLSB == 1)
-                CRCFull = (unsigned int)(CRCFull ^ 0xA001);
-        }
-    }
-    crc[1] = CRCHigh = (unsigned int)((CRCFull >> 8) & 0xFF);
-    crc[0] = CRCLow  = (unsigned int)( CRCFull & 0xFF);
-    message[message_length-2] = crc[0];
-    message[message_length-1] = crc[1];
+void Error_Handler(void)
+{
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
 }

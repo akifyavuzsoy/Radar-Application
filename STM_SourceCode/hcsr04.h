@@ -14,7 +14,7 @@ class HCSR04
 		
 	public:
 		HCSR04(pinStruct_t& echoPin, TIM_TypeDef* TIMx, uint8_t gpioAFSelTIMx);
-		uint32_t GetDistance(void); 
+		uint32_t GetDistance(void);
 };
 
 #endif // HCSR04_H

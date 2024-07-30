@@ -21,7 +21,6 @@ class Servo
 		
 		void TurnShaft(uint16_t position);
 		void TurnShaft(uint32_t position);
-	
 };
 
 

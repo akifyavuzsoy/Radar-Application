@@ -2,6 +2,8 @@
 
 SysController syscontroller; 
 
+UART_HandleTypeDef huart2;
+
 int main(void)
 {	
 	syscontroller.majorVersion = 01;
@@ -29,6 +31,9 @@ int main(void)
 	// For Servo Motor
 	static Servo servo(syscontroller.servoPin, TIM4, GPIO_AF2_TIM4, TIM_CHANNEL_3);					// Created object for Servo Motor
 	
+	// For UART
+	Uart uart(&huart2, 115200);
+	
 	servo.TurnShaft((uint16_t)90);
 	HAL_Delay(1000);
 	
@@ -53,7 +58,8 @@ int main(void)
 			case SEND_MESSAGE:
 			{
 				// Send message via UART
-				Assign_UartTxBuf(&syscontroller);
+				Assign_UartTxBuf(&syscontroller, &uart);
+				uart.sentDataToUART(huart2, syscontroller.UART_TX_BUF, BufSize, 100);
 				syscontroller.sysState = GET_DISTANCE;
 				break;
 			}
@@ -67,3 +73,4 @@ extern "C" void SysTick_Handler(void)
 {
 	HAL_IncTick();
 }
+

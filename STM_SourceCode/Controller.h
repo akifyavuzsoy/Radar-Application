@@ -3,6 +3,7 @@
 
 #include "hcsr04.h"
 #include "servo.h"
+#include "uart.h"
 
 #define BufSize 128
 
@@ -22,6 +23,7 @@ typedef struct {
 	uint8_t majorVersion;
 	uint8_t minorVersion;
 	
+	
 	uint32_t HCSR04_Distance;
 	uint16_t Servo_Position;
 
@@ -34,15 +36,17 @@ typedef struct {
 
 	unsigned char UART_RX_BUF[BufSize];
 	unsigned char UART_TX_BUF[BufSize];
+	
 } SysController;
 
 void Init_System_Controller(SysController* controller);
+
 void Servo_IncreasePosition(SysController* controller,Servo* servo, uint8_t increment);
-void Assign_UartTxBuf(SysController* controller);
+void Assign_UartTxBuf(SysController* controller, Uart* uart);
 
-char CRC_check(char message[],unsigned int message_length);
-void GetCRC(char message[],unsigned int message_length);
-void GetCRC(unsigned char message[],unsigned int message_length);
-
+void Error_Handler(void);
+void HAL_MspInit(void);
+void HAL_UART_MspInit(UART_HandleTypeDef* huart);
+void HAL_UART_MspDeInit(UART_HandleTypeDef* huart);
 
 #endif // CONTROLLER_H

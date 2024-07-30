@@ -425,6 +425,16 @@
               <FileType>5</FileType>
               <FilePath>.\servo.h</FilePath>
             </File>
+            <File>
+              <FileName>uart.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\uart.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>uart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\uart.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -32,4 +32,5 @@
 .\objects\controller.o: C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h
 .\objects\controller.o: C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_usart.h
 .\objects\controller.o: servo.h
+.\objects\controller.o: uart.h
 .\objects\controller.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
