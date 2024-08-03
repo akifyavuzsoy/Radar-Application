@@ -7,7 +7,7 @@ UART_HandleTypeDef huart2;
 int main(void)
 {	
 	syscontroller.majorVersion = 01;
-	syscontroller.minorVersion = 01;
+	syscontroller.minorVersion = 02;
 	
 	HAL_Init();
 	// For HCSR04 Sensor 

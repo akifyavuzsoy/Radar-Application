@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+<file alias="img.src">C:/Users/ASUS/Desktop/Embedded_System_Projects/STM_Cpp_Projects/Radar_Application/UI_SourceCode/RadarAppUI/img.src</file>
+</qresource>
+</RCC>
